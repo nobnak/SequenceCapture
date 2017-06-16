@@ -9,7 +9,7 @@ namespace SequenceCaptureSystem {
     public class SequenceCapture : MonoBehaviour {
         public enum FormatEnum { JPEG = 0, PNG }
 
-        public System.Environment.SpecialFolder saveFolder = System.Environment.SpecialFolder.MyPictures;
+        public string saveFolder = @"%USERPROFILE%\Pictures";
         public int fps = 30;
         public int limitImageCount = -1;
         public FormatEnum format;
@@ -21,7 +21,8 @@ namespace SequenceCaptureSystem {
         void Awake() {
             _tex = new Texture2D (0, 0, TextureFormat.ARGB32, false);
 
-            var folder = System.Environment.GetFolderPath (saveFolder);
+            var folder = GetFolderPath();
+            Debug.LogFormat ("Folder Path {0}", folder);
             switch (format) {
             case FormatEnum.JPEG:
                 serializer = new JpegSerializer (folder);
@@ -55,6 +56,9 @@ namespace SequenceCaptureSystem {
                 Debug.LogError (e);
             }
     	}
+        string GetFolderPath() {
+            return System.Environment.ExpandEnvironmentVariables (saveFolder);
+        }
 
         public abstract class AbstractTextureSerializer : System.IDisposable {
             const string FORMAT_FILE = "{0}_{1}_{{0:D5}}.{2}";
