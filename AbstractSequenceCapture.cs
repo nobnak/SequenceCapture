@@ -10,11 +10,16 @@ namespace SequenceCaptureSystem {
     public abstract class AbstractSequenceCapture : MonoBehaviour {
         public enum FormatEnum { JPEG = 0, PNG }
 
-        public string saveFolder = @"%USERPROFILE%\Pictures";
-        public int fps = 30;
-        public int limitImageCount = -1;
-        public FormatEnum format;
+        [SerializeField]
+        protected string saveFolder = @"%USERPROFILE%\Pictures";
+        [SerializeField]
+        protected int fps = 30;
+        [SerializeField]
+        protected int limitImageCount = -1;
+        [SerializeField]
+        protected FormatEnum format;
 
+        [SerializeField]
         protected int imageCounter = 0;
         protected AbstractTextureSerializer serializer;
 
