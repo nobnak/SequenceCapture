@@ -27,7 +27,7 @@ namespace SequenceCaptureSystem {
 
         #region implemented abstract members of AbstractSequenceCapture
         protected override void Start () {
-            _tex = new Texture2D (0, 0, TextureFormat.ARGB32, false);
+            _tex = new Texture2D (4, 4, TextureFormat.ARGB32, false);
         }
         protected override void Stop () {
             Destroy (_tex);
