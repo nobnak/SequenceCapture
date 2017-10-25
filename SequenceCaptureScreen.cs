@@ -1,10 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.IO;
-using UnityEngine.SceneManagement;
-using SequenceCaptureSystem.Format;
-
-namespace SequenceCaptureSystem {
+﻿namespace SequenceCaptureSystem {
 
     public class SequenceCaptureScreen : AbstractSequenceCapture {
 

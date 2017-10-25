@@ -1,8 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using System.IO;
-using UnityEngine.SceneManagement;
-using SequenceCaptureSystem.Format;
+﻿using SequenceCaptureSystem.Format;
+using UnityEngine;
 
 namespace SequenceCaptureSystem {
 
