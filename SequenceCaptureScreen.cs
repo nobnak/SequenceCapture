@@ -1,10 +1,10 @@
 ﻿namespace SequenceCaptureSystem {
 
-    public class SequenceCaptureScreen : AbstractSequenceCapture {
+    public class SequenceCaptureScreen : SequenceCaptureBase {
 
         #region Unity
     	protected virtual void OnPostRender() {
-            Capture ();
+            CapturePerFrame();
         }
         #endregion
     }

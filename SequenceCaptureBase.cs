@@ -1,10 +1,11 @@
-﻿using SequenceCaptureSystem.Format;
+﻿using Gist.Scoped;
+using SequenceCaptureSystem.Format;
 using UnityEngine;
 
 namespace SequenceCaptureSystem {
 
     [RequireComponent(typeof(Camera))]
-    public abstract class AbstractSequenceCapture : MonoBehaviour {
+    public class SequenceCaptureBase : MonoBehaviour {
         public enum FormatEnum { JPEG = 0, PNG }
 
         [SerializeField]
@@ -55,17 +56,24 @@ namespace SequenceCaptureSystem {
         }
         #endregion
 
-        protected virtual void DoCapture() {
+        public virtual void Capture() {
             int w, h;
             CaptureResolution(out w, out h);
             _tex.Resize(w, h);
             _tex.ReadPixels(new Rect(0f, 0f, w, h), 0, 0);
             serializer.Serialize(_tex);
         }
-        protected virtual void Capture() {
+        public virtual void Capture(params RenderTexture[] srcs) {
+            foreach (var src in srcs)
+                using (new ScopedRenderTextureActivator(src))
+                    Capture();
+        }
+
+        protected virtual void CapturePerFrame(RenderTexture src = null) {
             if (imageCounter > 0 && --imageCounter == 0)
                 enabled = false;
-            DoCapture ();
+
+            if (src != null) Capture(src); else Capture();
     	}
 
         protected virtual string GetFolderPath() {
