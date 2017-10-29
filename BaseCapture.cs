@@ -3,22 +3,15 @@ using SequenceCaptureSystem.Format;
 using UnityEngine;
 
 namespace SequenceCaptureSystem {
-
-    [RequireComponent(typeof(Camera))]
-    public class SequenceCaptureBase : MonoBehaviour {
+    
+    public class BaseCapture : MonoBehaviour {
         public enum FormatEnum { JPEG = 0, PNG }
 
         [SerializeField]
         protected string saveFolder = @"%USERPROFILE%\Pictures";
         [SerializeField]
-        protected int fps = 30;
-        [SerializeField]
-        protected int limitImageCount = -1;
-        [SerializeField]
         protected FormatEnum format;
-
-        [SerializeField]
-        protected int imageCounter = 0;
+        
         protected AbstractTextureSerializer serializer;
 
         protected Texture2D _tex;
@@ -36,14 +29,9 @@ namespace SequenceCaptureSystem {
                 break;
             }
 
-            Time.captureFramerate = fps;
-            imageCounter = limitImageCount;
-
             _tex = new Texture2D(4, 4, TextureFormat.ARGB32, false);
         }
         protected virtual void OnDisable() {
-            Time.captureFramerate = 0;
-
             Destroy(_tex);
         }
         #endregion
@@ -68,13 +56,6 @@ namespace SequenceCaptureSystem {
                 using (new ScopedRenderTextureActivator(src))
                     Capture();
         }
-
-        protected virtual void CapturePerFrame(RenderTexture src = null) {
-            if (imageCounter > 0 && --imageCounter == 0)
-                enabled = false;
-
-            if (src != null) Capture(src); else Capture();
-    	}
 
         protected virtual string GetFolderPath() {
             return System.Environment.ExpandEnvironmentVariables(saveFolder);

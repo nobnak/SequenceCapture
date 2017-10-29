@@ -15,7 +15,17 @@ namespace SequenceCaptureSystem.Format {
                 System.DateTime.Now.ToString("yyyyMMddHHmmss"),
                 extension));
         }
-        public abstract bool Serialize (Texture2D tex);
+        public virtual bool Serialize(Texture2D tex) {
+            try {
+                var path = string.Format(formatPath, Time.frameCount);
+                File.WriteAllBytes(path, ToByte(tex));
+                return true;
+            } catch (System.Exception e) {
+                Debug.LogError(e);
+            }
+            return false;
+        }
+        public abstract byte[] ToByte(Texture2D tex);
 
         #region IDisposable implementation
         public abstract void Dispose ();

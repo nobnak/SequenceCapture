@@ -11,17 +11,11 @@ namespace SequenceCaptureSystem.Format {
         public PngSerializer(string folder) : base(folder, EXTENSION) {}
 
         #region TextureSerializer implementation
-        public override bool Serialize (Texture2D tex) {
-            try {
-                var path = string.Format(formatPath, Time.frameCount);
-                File.WriteAllBytes (path, tex.EncodeToPNG ());
-                return true;
-            } catch (System.Exception e) {
-                Debug.LogError (e);
-            }
-            return false;
+        public override byte[] ToByte(Texture2D tex) {
+            return tex.EncodeToPNG();
         }
         #endregion
+
         #region IDisposable implementation
         public override void Dispose () { }
         #endregion
