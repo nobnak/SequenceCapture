@@ -1,4 +1,4 @@
-﻿using Gist.Scoped;
+﻿using nobnak.Gist.Scoped;
 using SequenceCaptureSystem.Format;
 using UnityEngine;
 

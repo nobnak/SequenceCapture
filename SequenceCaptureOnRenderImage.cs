@@ -1,4 +1,4 @@
-﻿using Gist.Scoped;
+﻿using nobnak.Gist.Scoped;
 using UnityEngine;
 
 namespace SequenceCaptureSystem {
