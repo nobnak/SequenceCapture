@@ -1,4 +1,4 @@
-﻿using nobnak.Gist.Scoped;
+using nobnak.Gist.Scoped;
 using SequenceCaptureSystem.Format;
 using UnityEngine;
 
@@ -14,8 +14,6 @@ namespace SequenceCaptureSystem {
         
         protected AbstractTextureSerializer serializer;
 
-        protected Texture2D _tex;
-
         #region Unity
         protected virtual void OnEnable() {
             var folder = GetFolderPath();
@@ -28,11 +26,8 @@ namespace SequenceCaptureSystem {
                 serializer = new PngSerializer (folder);
                 break;
             }
-
-            _tex = new Texture2D(4, 4, TextureFormat.ARGB32, false);
         }
         protected virtual void OnDisable() {
-            Destroy(_tex);
         }
         #endregion
 
@@ -45,19 +40,36 @@ namespace SequenceCaptureSystem {
         #endregion
 
         public virtual void Capture() {
-            int w, h;
-            CaptureResolution(out w, out h);
-            _tex.Resize(w, h);
-            _tex.ReadPixels(new Rect(0f, 0f, w, h), 0, 0);
-            serializer.Serialize(_tex);
+			using (var cap = new ScopedPlug<RenderTexture>(
+				RenderTexture.GetTemporary(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB),
+				s => RenderTexture.ReleaseTemporary(s))) {
+
+				Graphics.Blit(null, cap.Data);
+				CaptureDirect(cap.Data);
+			}
         }
         public virtual void Capture(params RenderTexture[] srcs) {
-            foreach (var src in srcs)
-                using (new ScopedRenderTextureActivator(src))
-                    Capture();
+			foreach (var src in srcs) {
+				using (var cap = new ScopedPlug<RenderTexture>(
+					RenderTexture.GetTemporary(src.width, src.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB),
+					s => RenderTexture.ReleaseTemporary(s))) {
+
+					Graphics.Blit(src, cap.Data);
+					CaptureDirect(cap.Data);
+				}
+			}
         }
 
-        protected virtual string GetFolderPath() {
+		protected virtual void CaptureDirect(RenderTexture src) {
+			using (var tex = new ScopedObject<Texture2D>(
+				new Texture2D(src.width, src.height, TextureFormat.ARGB32, false, false)))
+			using (new ScopedRenderTextureActivator(src)) {
+				tex.Data.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0);
+				serializer.Serialize(tex);
+			}
+		}
+
+		protected virtual string GetFolderPath() {
             return System.Environment.ExpandEnvironmentVariables(saveFolder);
         }
     }
