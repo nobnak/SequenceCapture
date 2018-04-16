@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.IO;
 using UnityEngine.SceneManagement;
@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 namespace SequenceCaptureSystem.Format {
 
     public abstract class AbstractTextureSerializer : System.IDisposable {
-        const string FORMAT_FILE = "{0}_{1}_{{0:D5}}_{{1}}.{2}";
+        const string FORMAT_FILE = "{0}_{1}_{{1}}_{{0:D5}}.{2}";
         protected readonly string formatPath;
 
         protected int uniquenessCounter = 0;
