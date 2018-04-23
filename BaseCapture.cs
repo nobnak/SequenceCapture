@@ -1,3 +1,4 @@
+using nobnak.Gist.Extensions.Texture2DExt;
 using nobnak.Gist.Scoped;
 using SequenceCaptureSystem.Format;
 using UnityEngine;
@@ -62,7 +63,7 @@ namespace SequenceCaptureSystem {
 
 		protected virtual void CaptureDirect(RenderTexture src) {
 			using (var tex = new ScopedObject<Texture2D>(
-				new Texture2D(src.width, src.height, TextureFormat.ARGB32, false, false)))
+				Texture2DExtension.Create(src.width, src.height, TextureFormat.ARGB32, false, false)))
 			using (new ScopedRenderTextureActivator(src)) {
 				tex.Data.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0);
 				serializer.Serialize(tex);
