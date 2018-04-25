@@ -1,6 +1,7 @@
 using nobnak.Gist.Extensions.Texture2DExt;
 using nobnak.Gist.Scoped;
 using SequenceCaptureSystem.Format;
+using System.IO;
 using UnityEngine;
 
 namespace SequenceCaptureSystem {
@@ -18,6 +19,7 @@ namespace SequenceCaptureSystem {
         #region Unity
         protected virtual void OnEnable() {
             var folder = GetFolderPath();
+			Directory.CreateDirectory(folder);
             Debug.LogFormat ("Folder Path {0}", folder);
             switch (format) {
             case FormatEnum.JPEG:
