@@ -5,7 +5,7 @@ using System.IO;
 using UnityEngine;
 
 namespace SequenceCaptureSystem {
-    
+
     public class BaseCapture : MonoBehaviour {
         public enum FormatEnum { JPEG = 0, PNG }
 
@@ -13,7 +13,7 @@ namespace SequenceCaptureSystem {
         protected string saveFolder = @"%USERPROFILE%\Pictures";
         [SerializeField]
         protected FormatEnum format;
-        
+
         protected AbstractTextureSerializer serializer;
 
         #region Unity
@@ -66,7 +66,7 @@ namespace SequenceCaptureSystem {
 		protected virtual void CaptureDirect(RenderTexture src) {
 			using (var tex = new ScopedObject<Texture2D>(
 				Texture2DExtension.Create(src.width, src.height, TextureFormat.ARGB32, false, false)))
-			using (new ScopedRenderTextureActivator(src)) {
+			using (new RenderTextureActivator(src)) {
 				tex.Data.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0);
 				serializer.Serialize(tex);
 			}
