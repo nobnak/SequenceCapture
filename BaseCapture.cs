@@ -1,4 +1,5 @@
 using nobnak.Gist.Extensions.Texture2DExt;
+using nobnak.Gist.Loader;
 using nobnak.Gist.Scoped;
 using SequenceCaptureSystem.Format;
 using System.IO;
@@ -9,8 +10,8 @@ namespace SequenceCaptureSystem {
     public class BaseCapture : MonoBehaviour {
         public enum FormatEnum { JPEG = 0, PNG }
 
-        [SerializeField]
-        protected string saveFolder = @"%USERPROFILE%\Pictures";
+		[SerializeField]
+		protected FolderPath saveFolder = new FolderPath(specialFolder: System.Environment.SpecialFolder.MyPictures);
         [SerializeField]
         protected FormatEnum format;
 
@@ -18,7 +19,7 @@ namespace SequenceCaptureSystem {
 
         #region Unity
         protected virtual void OnEnable() {
-            var folder = GetFolderPath();
+			var folder = saveFolder.Folder;
 			Directory.CreateDirectory(folder);
             Debug.LogFormat ("Folder Path {0}", folder);
             switch (format) {
@@ -43,37 +44,50 @@ namespace SequenceCaptureSystem {
         #endregion
 
         public virtual void Capture() {
-			using (var cap = new ScopedPlug<RenderTexture>(
-				RenderTexture.GetTemporary(Screen.width, Screen.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB),
-				s => RenderTexture.ReleaseTemporary(s))) {
+			var width = Screen.width;
+			var height = Screen.height;
+			var src = default(RenderTexture);
 
-				Graphics.Blit(null, cap.Data);
-				CaptureDirect(cap.Data);
+			var c = GetComponent<Camera>();
+			if (c != null) {
+				width = c.pixelWidth;
+				height = c.pixelHeight;
+				src = c.targetTexture;
 			}
-        }
-        public virtual void Capture(params RenderTexture[] srcs) {
-			foreach (var src in srcs) {
-				using (var cap = new ScopedPlug<RenderTexture>(
-					RenderTexture.GetTemporary(src.width, src.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB),
-					s => RenderTexture.ReleaseTemporary(s))) {
 
-					Graphics.Blit(src, cap.Data);
-					CaptureDirect(cap.Data);
-				}
+			using (new RenderTextureActivator(src))
+				CaptureDirect(width, height);
+		}
+
+		public virtual void Capture(params RenderTexture[] srcs) {
+			foreach (var src in srcs) {
+				using (new RenderTextureActivator(src))
+					CaptureDirect(src.width, src.height);
 			}
         }
 
 		protected virtual void CaptureDirect(RenderTexture src) {
+			var width = src.width;
+			var height = src.height;
+			using (new RenderTextureActivator(src))
+				CaptureDirect(width, height);
+		}
+
+		protected virtual void CaptureDirect(int width, int height) {
 			using (var tex = new ScopedObject<Texture2D>(
-				Texture2DExtension.Create(src.width, src.height, TextureFormat.ARGB32, false, false)))
-			using (new RenderTextureActivator(src)) {
-				tex.Data.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0);
+				Texture2DExtension.Create(width, height, TextureFormat.ARGB32, false, false))) {
+				tex.Data.ReadPixels(new Rect(0, 0, width, height), 0, 0);
 				serializer.Serialize(tex);
 			}
 		}
 
-		protected virtual string GetFolderPath() {
-            return System.Environment.ExpandEnvironmentVariables(saveFolder);
-        }
-    }
+		#region static
+		private static ScopedPlug<RenderTexture> GetCap(int width, int height) {
+			return new ScopedPlug<RenderTexture>(
+							RenderTexture.GetTemporary(width, height, 0,
+							RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB),
+							s => RenderTexture.ReleaseTemporary(s));
+		}
+		#endregion
+	}
 }
